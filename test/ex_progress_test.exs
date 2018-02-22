@@ -13,6 +13,17 @@ defmodule ExProgressTest do
   end
 
   describe "add_child/2" do
+    test "child not having completed any work means that the parent hasn't either" do
+      {:ok, parent} = ExProgress.start_link(1)
+      {:ok, child} = ExProgress.start_link(1)
+
+      :ok = ExProgress.add_child(parent, child, 1)
+
+      assert ExProgress.fraction_completed(child) == {:ok, 0.0}
+      assert ExProgress.fraction_completed(parent) == {:ok, 0.0}
+
+    end
+
     test "lone child completing its work means that the parent has completed its work" do
       {:ok, parent} = ExProgress.start_link(1)
       {:ok, child} = ExProgress.start_link(1)
