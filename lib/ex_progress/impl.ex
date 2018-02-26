@@ -57,9 +57,9 @@ defmodule ExProgress.Impl do
 
   defp parent_units_completed_by_children(state) do
     state.children
-    |> Enum.reduce(0, fn({child, portion}, total_units_completed) ->
-      {:ok, child_units_completed} = ExProgress.completed_work_units(child)
-      parent_units_completed_by_child = child_units_completed * (portion / state.total_work_units)
+    |> Enum.reduce(0, fn({child, childs_portion_of_parent_work_units}, total_units_completed) ->
+      {:ok, child_progress} = ExProgress.fraction_completed(child)
+      parent_units_completed_by_child = child_progress * childs_portion_of_parent_work_units
       total_units_completed + parent_units_completed_by_child
     end)
     |> Float.floor()

@@ -86,7 +86,7 @@ defmodule ExProgressTest do
       assert ExProgress.fraction_completed(parent) == {:ok, 1.0}
     end
 
-    test "two children completing 50% each means that the parent has completed 25%" do
+    test "two children completing 50% each means that the parent has completed 50%" do
       {:ok, parent} = ExProgress.start_link(4)
       {:ok, child1} = ExProgress.start_link(2)
       {:ok, child2} = ExProgress.start_link(2)
@@ -99,7 +99,7 @@ defmodule ExProgressTest do
 
       assert ExProgress.fraction_completed(child1) == {:ok, 0.5}
       assert ExProgress.fraction_completed(child2) == {:ok, 0.5}
-      assert ExProgress.fraction_completed(parent) == {:ok, 0.25}
+      assert ExProgress.fraction_completed(parent) == {:ok, 0.5}
     end
   end
 end
