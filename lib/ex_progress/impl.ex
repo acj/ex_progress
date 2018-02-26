@@ -4,12 +4,18 @@ defmodule ExProgress.Impl do
 
   def complete_work_unit(count \\ 1, state) do
     state = %{state | completed_work_units: state.completed_work_units + count}
+    notify_callback(state)
     fraction_completed(state)
   end
 
   def add_child(child, portion_of_parent_work_units, state) do
     # TODO: Verify that our work units aren't oversubscribed by children
     state = %{state | children: state.children ++ [{child, portion_of_parent_work_units}]}
+
+    parent = self()
+    :ok = ExProgress.Server.update_callback(child, fn(_) ->
+      ExProgress.complete_work_unit(parent)
+    end)
     {:ok, state}
   end
 
@@ -26,6 +32,18 @@ defmodule ExProgress.Impl do
       end
 
     {{:ok, val}, state}
+  end
+
+  def update_callback(state, new_callback_fun) do
+    state = %{state | callback_fun: new_callback_fun}
+    {:ok, state}
+  end
+
+  defp notify_callback(state) do
+    if fun = state.callback_fun do
+      {{:ok, progress}, _state} = fraction_completed(state)
+      fun.(progress)
+    end
   end
 
   defp have_children?(state) do

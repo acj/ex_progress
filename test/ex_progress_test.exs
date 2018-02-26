@@ -10,6 +10,30 @@ defmodule ExProgressTest do
 
       assert ExProgress.fraction_completed(progress) == {:ok, 1.0}
     end
+
+    test "parent completing a work unit invokes the callback" do
+      parent = self()
+      {:ok, progress} = ExProgress.start_link(1, [], fn(frac_completed) -> send(parent, {:progress, frac_completed}) end)
+
+      ExProgress.complete_work_unit(progress)
+
+      assert ExProgress.fraction_completed(progress) == {:ok, 1.0}
+      assert_receive {:progress, 1.0}
+    end
+
+    test "a child completing a work unit invokes the callback" do
+      parent = self()
+      callback_fun = fn(frac_completed) -> send(parent, {:progress, frac_completed}) end
+      {:ok, parent} = ExProgress.start_link(1, [], callback_fun)
+      {:ok, child} = ExProgress.start_link(1)
+
+      :ok = ExProgress.add_child(parent, child, 1)
+
+      ExProgress.complete_work_unit(child)
+
+      assert ExProgress.fraction_completed(parent) == {:ok, 1.0}
+      assert_receive {:progress, 1.0}
+    end
   end
 
   describe "add_child/2" do
@@ -30,7 +54,7 @@ defmodule ExProgressTest do
 
       :ok = ExProgress.add_child(parent, child, 1)
 
-      {:ok, _} = ExProgress.complete_work_unit(child)
+      :ok = ExProgress.complete_work_unit(child)
 
       assert ExProgress.fraction_completed(child) == {:ok, 1.0}
       assert ExProgress.fraction_completed(parent) == {:ok, 1.0}
@@ -44,8 +68,8 @@ defmodule ExProgressTest do
       :ok = ExProgress.add_child(parent, child1, 2)
       :ok = ExProgress.add_child(parent, child2, 2)
 
-      {:ok, _} = ExProgress.complete_work_unit(child1)
-      {:ok, _} = ExProgress.complete_work_unit(child2)
+      :ok = ExProgress.complete_work_unit(child1)
+      :ok = ExProgress.complete_work_unit(child2)
 
       assert ExProgress.fraction_completed(child1) == {:ok, 0.5}
       assert ExProgress.fraction_completed(child2) == {:ok, 0.5}

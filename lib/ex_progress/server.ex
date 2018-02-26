@@ -8,15 +8,16 @@ defmodule ExProgress.Server do
     start_link(total_work_units, [])
   end
 
-  def start_link(total_work_units, children, opts \\ []) do
-    GenServer.start_link(__MODULE__, [total_work_units, children], opts)
+  def start_link(total_work_units, children, callback_fun \\ fn(_) -> :ok end, opts \\ []) do
+    GenServer.start_link(__MODULE__, [total_work_units, children, callback_fun], opts)
   end
 
-  def init([total_work_units, children]) do
+  def init([total_work_units, children, callback_fun]) do
     state = %{
       total_work_units: total_work_units,
       completed_work_units: 0,
       children: children,
+      callback_fun: callback_fun
     }
 
     {:ok, state}
@@ -25,7 +26,7 @@ defmodule ExProgress.Server do
   # Delegated functions
 
   def complete_work_unit(progress, count \\ 1) do
-    GenServer.call(progress, {:complete_work_unit, count})
+    GenServer.cast(progress, {:complete_work_unit, count})
   end
 
   def add_child(progress, child, portion_of_parent_work_units) do
@@ -40,11 +41,15 @@ defmodule ExProgress.Server do
     GenServer.call(progress, {:completed_work_units})
   end
 
+  def update_callback(progress, new_callback_fun) do
+    GenServer.call(progress, {:update_callback, new_callback_fun})
+  end
+
   # GenServer
 
-  def handle_call({:complete_work_unit, count}, _from, state) do
-    {response, state} = Impl.complete_work_unit(count, state)
-    {:reply, response, state}
+  def handle_cast({:complete_work_unit, count}, state) do
+    {_response, state} = Impl.complete_work_unit(count, state)
+    {:noreply, state}
   end
 
   def handle_call({:add_child, child, portion_of_parent_work_units}, _from, state) do
@@ -52,7 +57,7 @@ defmodule ExProgress.Server do
     {:reply, response, state}
   end
 
-#  def handle_call({:remove_child, child}, _from, state) do
+  #  def handle_call({:remove_child, child}, _from, state) do
   #  end
 
   def handle_call({:completed_work_units}, _from, state) do
@@ -62,6 +67,11 @@ defmodule ExProgress.Server do
 
   def handle_call({:fraction_completed}, _from, state) do
     {response, state} = Impl.fraction_completed(state)
+    {:reply, response, state}
+  end
+
+  def handle_call({:update_callback, new_callback_fun}, _from, state) do
+    {response, state} = Impl.update_callback(state, new_callback_fun)
     {:reply, response, state}
   end
 end
