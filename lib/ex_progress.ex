@@ -1,11 +1,6 @@
 defmodule ExProgress do
   @moduledoc """
   Documentation for ExProgress.
-
-  TODO:
-  - Report via closure?
-  - Report on demand
-  - Specify granularity or frequency of reporting?
   """
 
   defdelegate start_link(total_work_units), to: ExProgress.Server
