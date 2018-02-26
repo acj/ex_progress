@@ -1,6 +1,5 @@
 defmodule ExProgress.Impl do
-  @moduledoc """
-  """
+  @moduledoc false
 
   def complete_work_unit(count \\ 1, state) do
     state = %{state | completed_work_units: state.completed_work_units + count}
