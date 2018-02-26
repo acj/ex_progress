@@ -9,6 +9,8 @@ defmodule ExProgress do
 
   defdelegate complete_work_unit(progress), to: ExProgress.Server
 
+  defdelegate update_completed_work_units(progress, completed_work_units), to: ExProgress.Server
+
   defdelegate add_child(progress, child, portion_of_parent_work_units), to: ExProgress.Server
 
   defdelegate completed_work_units(progress), to: ExProgress.Server

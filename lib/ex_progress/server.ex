@@ -29,6 +29,10 @@ defmodule ExProgress.Server do
     GenServer.cast(progress, {:complete_work_unit, count})
   end
 
+  def update_completed_work_units(progress, count) do
+    GenServer.cast(progress, {:update_completed_work_units, count})
+  end
+
   def add_child(progress, child, portion_of_parent_work_units) do
     GenServer.call(progress, {:add_child, child, portion_of_parent_work_units})
   end
@@ -49,6 +53,11 @@ defmodule ExProgress.Server do
 
   def handle_cast({:complete_work_unit, count}, state) do
     {_response, state} = Impl.complete_work_unit(count, state)
+    {:noreply, state}
+  end
+
+  def handle_cast({:update_completed_work_units, count}, state) do
+    {_response, state} = Impl.update_completed_work_units(count, state)
     {:noreply, state}
   end
 

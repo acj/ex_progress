@@ -7,6 +7,12 @@ defmodule ExProgress.Impl do
     fraction_completed(state)
   end
 
+  def update_completed_work_units(count, state) do
+    state = %{state | completed_work_units: count}
+    notify_callback(state)
+    fraction_completed(state)
+  end
+
   def add_child(child, portion_of_parent_work_units, state) do
     # TODO: Verify that our work units aren't oversubscribed by children
     state = %{state | children: state.children ++ [{child, portion_of_parent_work_units}]}
