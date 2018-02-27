@@ -1,5 +1,9 @@
 # ExProgress
 
+[![Hex.pm](https://img.shields.io/hexpm/v/ex_progress.svg)](https://hex.pm/packages/ex_progress)
+[![Build Docs](https://img.shields.io/badge/hexdocs-release-blue.svg)](https://hexdocs.pm/ex_progress/ExProgress.html)
+[![Build Status](https://travis-ci.org/acj/ex_progress.svg?branch=master)](https://travis-ci.org/acj/ex_progress)
+
 A library for tracking progress across many cooperating tasks.
 
 ## Getting Started
