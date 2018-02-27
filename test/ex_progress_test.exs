@@ -71,7 +71,6 @@ defmodule ExProgressTest do
 
       assert ExProgress.fraction_completed(child) == {:ok, 0.0}
       assert ExProgress.fraction_completed(parent) == {:ok, 0.0}
-
     end
 
     test "lone child completing its work means that the parent has completed its work" do
