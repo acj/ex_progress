@@ -3,9 +3,7 @@ defmodule ExProgress do
   Documentation for ExProgress.
   """
 
-  defdelegate start_link(total_work_units), to: ExProgress.Server
-
-  defdelegate start_link(total_work_units, children, opts \\ []), to: ExProgress.Server
+  defdelegate start_link(total_work_units, callback_fun \\ fn(_) -> :ok end, opts \\ []), to: ExProgress.Server
 
   defdelegate complete_work_unit(progress), to: ExProgress.Server
 

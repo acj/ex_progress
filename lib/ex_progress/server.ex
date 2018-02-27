@@ -4,19 +4,15 @@ defmodule ExProgress.Server do
   alias ExProgress.Impl
   use GenServer
 
-  def start_link(total_work_units) do
-    start_link(total_work_units, [])
+  def start_link(total_work_units, callback_fun \\ fn(_) -> :ok end, opts \\ []) do
+    GenServer.start_link(__MODULE__, [total_work_units, callback_fun], opts)
   end
 
-  def start_link(total_work_units, children, callback_fun \\ fn(_) -> :ok end, opts \\ []) do
-    GenServer.start_link(__MODULE__, [total_work_units, children, callback_fun], opts)
-  end
-
-  def init([total_work_units, children, callback_fun]) do
+  def init([total_work_units, callback_fun]) do
     state = %{
       total_work_units: total_work_units,
       completed_work_units: 0,
-      children: children,
+      children: [],
       callback_fun: callback_fun
     }
 
