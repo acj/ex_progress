@@ -46,6 +46,22 @@ defmodule ExProgressTest do
       assert_receive {:progress, 1.0}
     end
 
+    test "a grandchild completing a work unit invokes the callback" do
+      pid = self()
+      callback_fun = fn(frac_completed) -> send(pid, {:progress, frac_completed}) end
+      {:ok, grandparent} = ExProgress.start_link(1, callback_fun)
+      {:ok, parent} = ExProgress.start_link(1)
+      {:ok, child} = ExProgress.start_link(1)
+
+      :ok = ExProgress.add_child(grandparent, parent, 1)
+      :ok = ExProgress.add_child(parent, child, 1)
+
+      ExProgress.complete_work_unit(child)
+
+      assert ExProgress.fraction_completed(parent) == {:ok, 1.0}
+      assert_receive {:progress, 1.0}
+    end
+
     test "a child updating its completed work unit count invokes the callback" do
       pid = self()
       callback_fun = fn(frac_completed) -> send(pid, {:progress, frac_completed}) end
