@@ -11,6 +11,14 @@ defmodule ExProgressTest do
       assert ExProgress.fraction_completed(progress) == {:ok, 1.0}
     end
 
+    test "completing a work unit yields one completed work unit" do
+      {:ok, progress} = ExProgress.start_link(1)
+
+      ExProgress.complete_work_unit(progress)
+
+      assert ExProgress.completed_work_units(progress) == {:ok, 1}
+    end
+
     test "updating the completed work unit count invokes the callback" do
       pid = self()
       {:ok, progress} = ExProgress.start_link(1, fn(frac_completed) -> send(pid, {:progress, frac_completed}) end)
