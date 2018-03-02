@@ -21,7 +21,10 @@ defmodule ExProgress.Mixfile do
           "README.md": [title: "README", name: "readme"],
         ],
         main: "readme",
-      ]
+      ],
+
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test]
     ]
   end
 
