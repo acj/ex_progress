@@ -4,7 +4,7 @@ defmodule ExProgress.Mixfile do
   def project do
     [
       app: :ex_progress,
-      version: "0.1.0",
+      version: "1.0.0",
       elixir: "~> 1.6",
       start_permanent: Mix.env == :prod,
       deps: deps(),
