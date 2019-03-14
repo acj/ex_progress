@@ -125,4 +125,30 @@ defmodule ExProgressTest do
       assert ExProgress.fraction_completed(parent) == {:ok, 0.5}
     end
   end
+
+  describe "stress tests" do
+    test "correctness with large number of children" do
+      pid = self()
+      how_many = 250
+      callback_fun = fn(frac_completed) -> send(pid, {:progress, frac_completed}) end
+      {:ok, parent} = ExProgress.start_link(how_many, callback_fun)
+
+      children = Enum.map(0..(how_many-1), fn(_) ->
+        {:ok, child} = ExProgress.start_link(1000)
+        :ok = ExProgress.add_child(parent, child, 1)
+        child
+      end)
+
+      Enum.each(0..(how_many-1), fn(i) ->
+        ExProgress.update_completed_work_units(Enum.at(children, i), 500)
+      end)
+
+      Enum.each(0..(how_many-1), fn(i) ->
+        ExProgress.update_completed_work_units(Enum.at(children, i), 1000)
+      end)
+
+      assert ExProgress.fraction_completed(parent) == {:ok, 1.0}
+      assert_receive {:progress, 1.0}
+    end
+  end
 end
