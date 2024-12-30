@@ -10,17 +10,17 @@ jobs:
   build:
 
     name: Build and test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Elixir
-      uses: erlef/setup-elixir@988e02bfe678367a02564f65ca2e37726dc0268f # 1.9.0
+      uses: erlef/setup-elixir@5304e04ea2b355f03681464e683d92e3b2f18451 # 1.18.2
       with:
-        elixir-version: "1.12.1"
-        otp-version: "22.3"
+        elixir-version: "1.18.1"
+        otp-version: "27.2"
     - name: Restore dependencies cache
-      uses: actions/cache@v2
+      uses: actions/cache@v5
       with:
         path: deps
         key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
